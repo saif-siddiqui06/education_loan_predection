@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Loan Predictor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #eef2f3;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 750px;
+            margin-top: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        h2, h5 {
+            text-align: center;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .tooltip-icon {
+            cursor: pointer;
+            color: #007bff;
+        }
+        .result, .info-text {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #eligibility-gauge {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .low { background-color: #dc3545; }
+        .medium { background-color: #ffc107; }
+        .high { background-color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎓 Education Loan Predictor</h2>
+        <div class="info-box">
+            <h5>About This Tool</h5>
+            <p>This AI-powered tool predicts education loan approval chances and estimates monthly EMI.</p>
+        </div>
+
+        <form action="/predict" method="post" oninput="calculateEMI()">
+            <div class="mb-3">
+                <label class="form-label">Annual Income (₹) <span class="tooltip-icon" title="Your yearly salary before deductions">ℹ️</span></label>
+                <input type="number" class="form-control" name="income" id="income" required placeholder="Enter your yearly income">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Loan Amount (₹) <span class="tooltip-icon" title="Total loan amount you need">ℹ️</span></label>
+                <input type="number" class="form-control" name="loan_amount" id="loanAmount" required placeholder="Desired loan amount">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Interest Rate (%) <span class="tooltip-icon" title="Interest charged on the loan">ℹ️</span></label>
+                <input type="number" step="0.1" class="form-control" name="interest_rate" id="interestRate" required placeholder="E.g., 7.5">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Loan Duration (Years) <span class="tooltip-icon" title="Total repayment period in years">ℹ️</span></label>
+                <input type="number" class="form-control" name="loan_duration" id="loanDuration" required placeholder="Number of years">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Previous Loan Status <span class="tooltip-icon" title="Was your previous loan approved or denied?">ℹ️</span></label>
+                <select class="form-control" name="previous_loan_status" required>
+                    <option value="1">Approved</option>
+                    <option value="0">Not Approved</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Estimated EMI:</label>
+                <span id="calculatedEMI">₹0</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Loan-to-Income Ratio:</label>
+                <span id="loanIncomeRatio">0%</span>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Predict Loan Status</button>
+        </form>
+        
+        {% if approval %}
+            <div class="result alert alert-info">
+                {{ approval }} <br>
+                <strong>Approval Probability:</strong> {{ probability }}%
+            </div>
+            <div id="eligibility-gauge" class="{{ 'high' if probability > 75 else 'medium' if probability > 50 else 'low' }}">
+                Loan Approval Likelihood: {{ probability }}%
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function calculateEMI() {
+            let loanAmount = parseFloat(document.getElementById("loanAmount").value) || 0;
+            let interestRate = parseFloat(document.getElementById("interestRate").value) || 0;
+            let loanDuration = parseFloat(document.getElementById("loanDuration").value) || 0;
+            let income = parseFloat(document.getElementById("income").value) || 0;
+            
+            if (loanAmount > 0 && interestRate > 0 && loanDuration > 0) {
+                let monthlyRate = (interestRate / 100) / 12;
+                let months = loanDuration * 12;
+                let emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+                document.getElementById("calculatedEMI").innerText = "₹" + emi.toFixed(2);
+            } else {
+                document.getElementById("calculatedEMI").innerText = "₹0";
+            }
+            
+            if (income > 0) {
+                let ratio = ((loanAmount / income) * 100).toFixed(2);
+                document.getElementById("loanIncomeRatio").innerText = ratio + "%";
+            } else {
+                document.getElementById("loanIncomeRatio").innerText = "0%";
+            }
+        }
+    </script>
+</body>
+</html>

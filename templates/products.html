@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - BuildTech.io</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>BuildTech.io</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/about">About Us</a>
+                <a href="/products">Products</a>
+                <a href="/services">Services</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section for Products -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Explore Our Solutions</h2>
+                <p>At BuildTech.io, we offer a range of innovative products designed to address various needs. Our solutions are crafted with the latest technology to ensure they provide exceptional value and performance.</p>
+            </div>
+        </section>
+
+        <!-- Product Cards -->
+        <section id="products">
+            <div class="container">
+                <div class="product-cards">
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/products/health.jpg') }}" alt="Health Assistance">
+                        <h3>Health Assistance</h3>
+                        <p>Our Health Assistance tool leverages AI to provide users with personalized health management solutions. From tracking vital statistics to offering actionable insights, our tool aims to improve overall well-being and provide timely medical support.</p>
+                    </div>
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/products/resume.png') }}" alt="Resume Builder">
+                        <h3>Resume Builder</h3>
+                        <p>The Resume Builder is designed to help job seekers create professional, eye-catching resumes with ease. Choose from a variety of templates, customize your content, and generate a polished resume ready for any job application.</p>
+                    </div>
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/products/ai.jpg') }}" alt="AI Tools for Students">
+                        <h3>AI Tools for Students</h3>
+                        <p>Our suite of AI tools provides students with intelligent study aids, personalized learning plans, and academic support. These tools are designed to enhance the learning experience and help students achieve their academic goals more effectively.</p>
+                    </div>
+                    <!-- New QR Code Generator Product -->
+                    <div class="card">
+                        <img src="{{ url_for('static', filename='images/products/qr_1.png') }}" alt="QR Code Generator">
+                        <h3>QR Code Generator</h3>
+                        <p>Our QR Code Generator allows you to create custom QR codes for URLs, contact information, and other data. It's an easy-to-use tool for generating quick and scannable QR codes for your business or personal needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <section id="contact">
+                <h2>Contact Us</h2>
+                <p>We would love to hear from you! Whether you have a question about our products, need support, or just want to say hello, feel free to reach out to us through the following contact details:</p>
+                <p>Email: <a href="mailto:contact@buildtech.io">contact@buildtech.io</a> | Phone: +123 456 7890</p>
+            </section>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -3,7 +3,13 @@ import pickle
 import pandas as pd
 import logging
 
+
 app = Flask(__name__)
+
+def handler(event, context):
+    return app(event, context)
+
+
 
 # Configure logging
 logging.basicConfig(level=logging.ERROR)

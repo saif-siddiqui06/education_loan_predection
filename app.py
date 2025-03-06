@@ -38,49 +38,60 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """Process form submission, make a loan prediction, and return the result."""
     try:
-        # Debugging: Log received form data
-        print("Received Form Data:", request.form)
-
-        # Ensure all required fields exist
-        required_fields = ['income', 'loan_amount', 'interest_rate', 'previous_loan_status']
-        if not all(k in request.form for k in required_fields):
-            return render_template('index.html', error="Error: Missing form data!"), 400
-
-        # Get user input from form
+        # Get user input
         income = float(request.form['income'])
         loan_amount = float(request.form['loan_amount'])
         interest_rate = float(request.form['interest_rate'])
         previous_loan_status = int(request.form['previous_loan_status'])
+        loan_duration = int(request.form['loan_duration'])
 
-        # Compute derived feature (debt_to_income_ratio) safely
-        debt_to_income_ratio = loan_amount / income if income > 0 else 0
+        # Compute derived features
+        debt_to_income_ratio = loan_amount / income
 
-        # Prepare data in the correct order
+        # Prepare data for model prediction
         user_input = [[income, loan_amount, interest_rate, previous_loan_status, debt_to_income_ratio]]
-        
-        # Convert to DataFrame to maintain feature names
         user_df = pd.DataFrame(user_input, columns=feature_names)
 
-        # Debugging: Log input DataFrame
-        print("User DataFrame:\n", user_df)
-
-        # Scale input
+        # Scale input and make prediction
         user_scaled = scaler.transform(user_df)
-
-        # Make prediction
         prediction = model.predict(user_scaled)[0]
-        probability = model.predict_proba(user_scaled)[0][1] * 100  # Probability of approval
+        probability = model.predict_proba(user_scaled)[0][1] * 100  # Approval probability
 
-        # Determine approval message
+        # Loan calculations
+        monthly_rate = (interest_rate / 100) / 12
+        months = loan_duration * 12
+        emi = (loan_amount * monthly_rate * (1 + monthly_rate) ** months) / ((1 + monthly_rate) ** months - 1)
+        total_amount_paid = emi * months
+        total_interest_paid = total_amount_paid - loan_amount
+
+        # Loan risk indicator
+        risk_level = "Low" if debt_to_income_ratio < 0.3 else "Medium" if debt_to_income_ratio < 0.6 else "High"
+
+        # Dynamic Advice Based on Probability
+        if probability > 75:
+            advice = "✅ Your chances of approval are great! Consider checking different banks for better rates."
+        elif probability > 50:
+            advice = "⚠️ Your approval chances are moderate. You may improve your credit score or reduce loan amount."
+        else:
+            advice = "❌ Approval chances are low. Consider applying for a lower loan amount or adding a co-applicant."
+
+        # Approval message
         approval_text = "✅ Loan Approved" if prediction == 1 else "❌ Loan Not Approved"
 
-        return render_template('index.html', approval=approval_text, probability=round(probability, 2))
+        return render_template('index.html', 
+                               approval=approval_text, 
+                               probability=round(probability, 2),
+                               emi=round(emi, 2),
+                               total_amount_paid=round(total_amount_paid, 2),
+                               total_interest_paid=round(total_interest_paid, 2),
+                               risk_level=risk_level,
+                               advice=advice)
 
     except Exception as e:
-        logging.error(f"Prediction Error: {e}")  # Log the error
-        return render_template('index.html', error="An error occurred while processing your request. Please try again."), 400
+        return render_template('index.html', error=f"Error: {e}"), 400
+
+
 
 @app.route('/predict-api', methods=['POST'])
 def predict_api():
